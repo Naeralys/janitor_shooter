@@ -10,8 +10,8 @@
 #define Game_hpp
 
 #include <iostream>
-#include "SDL2/SDL.h"
-#include "SDL2_image/SDL_image.h"
+#include <SDL2/SDL.h>
+#include <SDL2_image/SDL_image.h>
 
 extern const int SCREEN_WIDTH;
 extern const int SCREEN_HEIGHT;
