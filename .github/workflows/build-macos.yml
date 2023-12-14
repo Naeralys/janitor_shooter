@@ -17,3 +17,8 @@ jobs:
           cmake .
           make
 
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: bin folder
+          path: bin
