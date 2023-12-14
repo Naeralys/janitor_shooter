@@ -1,7 +1,15 @@
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
+build/
+packages/
 bin/
+
+CPackConfig.cmake
+CPackSourceConfig.cmake
+install_manifest.txt
+Makefile
+_CPack_Packages
 
 Shooter
 
