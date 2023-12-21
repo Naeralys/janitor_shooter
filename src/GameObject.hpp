@@ -15,10 +15,10 @@ class GameObject
 {
 private:
     SDL_Texture *texture;
-    SDL_Rect dest, src;
     SDL_Renderer *renderer;
 
 public:
+    SDL_Rect dest, src;
     float w, h, x, y, velX, velY;
     int alpha;
     GameObject(const char *fileName, SDL_Renderer *renderer, int xPos, int yPos, int width, int height, int alpha = 255);

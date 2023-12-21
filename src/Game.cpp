@@ -12,10 +12,11 @@
 #include "GameObject.hpp"
 #include "Combat.hpp"
 #include "Collision.hpp"
+#include <vector>
 
 Character *playerOne, *playerTwo;
-GameObject *bulletOne[10], *bulletTwo[10], *tile[5], *map, *shadowOverlay;
-std::vector<GameObject *> *gameObjects;
+GameObject *bulletOne[10], *bulletTwo[10], *tile[5], *map, *shadowOverlay, *assets;
+std::vector<GameObject *> gameObjects;
 Combat *combat;
 Collision *collision;
 SDL_GameController *controller[2];
@@ -33,24 +34,17 @@ void Game::Init(const char *title, int xPos, int yPos, int width, int height, bo
     {
         // Create a window
         window = SDL_CreateWindow(title, xPos, yPos, width, height, fullscreen);
-        if (window)
-        {
-            std::cout << "Window created!" << std::endl;
-        }
-        else
+        if (!window)
         {
             std::cout << "Error creating window..." << std::endl;
         }
         // Create a renderer
         renderer = SDL_CreateRenderer(window, -1, 0);
-        if (renderer)
-        {
-            std::cout << "Renderer created!" << std::endl;
-        }
-        else
+        if (!renderer)
         {
             std::cout << "Error creating renderer..." << std::endl;
         }
+
         isRunning = true;
         std::cout << "SDL Initialized successfully!" << std::endl;
     }
@@ -58,6 +52,7 @@ void Game::Init(const char *title, int xPos, int yPos, int width, int height, bo
     {
         isRunning = false;
         std::cout << "Error initializing SDL..." << std::endl;
+        return;
     }
 
     // Initialize game controllers, maximum 2 players
@@ -66,11 +61,7 @@ void Game::Init(const char *title, int xPos, int yPos, int width, int height, bo
         if (SDL_IsGameController(i))
         {
             controller[i] = SDL_GameControllerOpen(i);
-            if (controller[i])
-            {
-                std::cout << "Game controller found" << std::endl;
-            }
-            else
+            if (!controller[i])
             {
                 std::cout << "Could not open game controller" << std::endl;
             }
@@ -79,7 +70,8 @@ void Game::Init(const char *title, int xPos, int yPos, int width, int height, bo
 
     // Create game assets
     map = new GameObject("assets/background.png", Game::renderer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    shadowOverlay = new GameObject("assets/shadow_overlay.png", Game::renderer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 100);
+    assets = new GameObject("assets/background_assets.png", Game::renderer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    shadowOverlay = new GameObject("assets/shadow_overlay.png", Game::renderer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 200);
 
     // Load players
     playerOne = new Character("assets/player_one.bmp", Game::renderer, 130, SCREEN_HEIGHT - 300);
@@ -91,9 +83,12 @@ void Game::Init(const char *title, int xPos, int yPos, int width, int height, bo
         bulletTwo[i] = new GameObject("assets/bullet.bmp", Game::renderer, 0, 0, 5, 5);
     }
     // Load tiles
-    tile[0] = new GameObject("assets/bullet.bmp", Game::renderer, 100, SCREEN_HEIGHT - 250, 100, 10);
-    tile[1] = new GameObject("assets/bullet.bmp", Game::renderer, (SCREEN_WIDTH / 2) - 50, SCREEN_HEIGHT - 300, 100, 10);
-    tile[2] = new GameObject("assets/bullet.bmp", Game::renderer, SCREEN_WIDTH - 200, SCREEN_HEIGHT - 250, 100, 10);
+    tile[0] = new GameObject("assets/platform.png", Game::renderer, 100, SCREEN_HEIGHT - 250, 195, 20);
+    tile[1] = new GameObject("assets/platform.png", Game::renderer, (SCREEN_WIDTH / 2) - 98, SCREEN_HEIGHT - 400, 195, 20);
+    tile[2] = new GameObject("assets/platform.png", Game::renderer, SCREEN_WIDTH - 290, SCREEN_HEIGHT - 250, 195, 20);
+
+    // Populate game objects into vector array for easy update and rendering
+    gameObjects = {map, assets, playerOne, playerTwo, tile[0], tile[1], tile[2], shadowOverlay};
 }
 
 void Game::Start()
@@ -103,7 +98,11 @@ void Game::Start()
     {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderClear(renderer);
+
         map->Render();
+        assets->Render();
+        shadowOverlay->Render();
+
         SDL_RenderPresent(renderer);
 
         SDL_Event event;
@@ -144,6 +143,28 @@ void Game::HandleEvents()
     // Keyboard - Movement
     if (!playerOne->CheckKeyLock())
     {
+        // Dash
+        if (
+            keyState[SDL_SCANCODE_E]
+            //&& playerOne->velX > -2 && playerOne->velX < 5.1
+        )
+        {
+            playerOne->velX = 15;
+            playerOne->KeyLock(25);
+            playerOne->Invulnerable();
+            return;
+        }
+        if (
+            keyState[SDL_SCANCODE_Q]
+            // && playerOne->velX < 2 && playerOne->velX > -5.1
+        )
+        {
+            playerOne->velX = -15;
+            playerOne->KeyLock(25);
+            playerOne->Invulnerable();
+            return;
+        }
+
         // Jump
         if (keyState[SDL_SCANCODE_W] && playerOne->velY == 0)
             playerOne->velY = -20;
@@ -160,19 +181,6 @@ void Game::HandleEvents()
         }
         else
             playerOne->Running(0);
-        // Dash
-        if (keyState[SDL_SCANCODE_E] && playerOne->velX > -2 && playerOne->velX < 5.1)
-        {
-            playerOne->velX = 15;
-            playerOne->KeyLock(25);
-            playerOne->Invulnerable();
-        }
-        if (keyState[SDL_SCANCODE_Q] && playerOne->velX < 2 && playerOne->velX > -5.1)
-        {
-            playerOne->velX = -15;
-            playerOne->KeyLock(25);
-            playerOne->Invulnerable();
-        }
     }
     // Keyboard - Combat
     playerOne->cooldown++;
@@ -421,21 +429,22 @@ void Game::Update()
         collision->Bullet(playerTwo, bulletOne[i]);
         collision->Bullet(playerOne, bulletTwo[i]);
     }
-    // Update position
+
     playerOne->Update();
     playerTwo->Update();
-    for (int i = 0; i < 10; i++)
+
+    for (GameObject *obj : gameObjects)
     {
-        bulletOne[i]->Update();
-        bulletTwo[i]->Update();
+        obj->Update();
     }
+
     // Winning condition
-    if (playerOne->x < 0 || playerOne->x > SCREEN_WIDTH)
+    if (playerOne->x < -80 || playerOne->x > SCREEN_WIDTH - 128)
     {
         std::cout << "Player Two Wins!" << std::endl;
         Game::Reset();
     }
-    if (playerTwo->x < 0 || playerTwo->x > SCREEN_WIDTH)
+    if (playerTwo->x < -80 || playerTwo->x > SCREEN_WIDTH - 128)
     {
         std::cout << "Player One Wins!" << std::endl;
         Game::Reset();
@@ -448,37 +457,18 @@ void Game::Render()
 {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
-    map->Render();
-    tile[0]->Render();
-    tile[1]->Render();
-    tile[2]->Render();
-    playerOne->Render();
-    playerTwo->Render();
-    for (int i = 0; i < 10; i++)
-    {
-        bulletOne[i]->Render();
-        bulletTwo[i]->Render();
-    }
 
-    shadowOverlay->Render();
+    for (GameObject *obj : gameObjects)
+    {
+        obj->Render();
+    }
 
     SDL_RenderPresent(renderer);
 }
 void Game::Reset()
 {
-    // Reset player one
-    playerOne->x = 150;
-    playerOne->y = SCREEN_HEIGHT - 250;
-    playerOne->velX = 0;
-    playerOne->velY = 0;
-    playerOne->ResetKnockback();
-
-    // Reset player two
-    playerTwo->x = SCREEN_WIDTH - 150;
-    playerTwo->y = SCREEN_HEIGHT - 250;
-    playerTwo->velX = 0;
-    playerTwo->velY = 0;
-    playerTwo->ResetKnockback();
+    playerOne->Reset(150);
+    playerTwo->Reset(SCREEN_WIDTH - 150);
 
     // Start screen
     Game::Start();

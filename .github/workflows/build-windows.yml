@@ -1,0 +1,25 @@
+name: Build Windows
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up CMake
+        uses: cmake/setup-cmake@v1
+
+      - name: Build project
+        run: cmake --build . --config Release
+
+      - name: Export artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Binaries
+          path: bin/
