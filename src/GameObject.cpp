@@ -9,9 +9,10 @@
 #include "GameObject.hpp"
 #include "TextureManager.hpp"
 
-GameObject::GameObject( const char* fileName, SDL_Renderer* renderer, int xPos, int yPos, int width, int height ) {
+GameObject::GameObject(const char *fileName, SDL_Renderer *renderer, int xPos, int yPos, int width, int height, int alpha)
+{
     this->renderer = renderer;
-    texture = TextureManager::LoadTexture( fileName );
+    texture = TextureManager::LoadTexture(fileName);
     this->x = xPos;
     this->y = yPos;
     this->w = width;
@@ -24,14 +25,19 @@ GameObject::GameObject( const char* fileName, SDL_Renderer* renderer, int xPos, 
     dest.w = src.w;
     dest.x = xPos;
     dest.y = yPos;
+    this->alpha = alpha;
 }
 
-void GameObject::Update() {
+void GameObject::Update()
+{
     dest.x = x;
     dest.y = y;
     x += velX;
     y += velY;
 }
-void GameObject::Render() {
-    SDL_RenderCopy( Game::renderer, texture, &src, &dest );
+void GameObject::Render()
+{
+    SDL_SetTextureAlphaMod(texture, alpha);
+    SDL_RenderCopy(Game::renderer, texture, &src, &dest);
+    SDL_SetTextureAlphaMod(texture, alpha);
 }

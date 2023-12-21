@@ -1,4 +1,4 @@
-///Users/adam/Development/Shooter/Shooter/GameObject.hpp
+/// Users/adam/Development/Shooter/Shooter/GameObject.hpp
 //  GameObject.hpp
 //  Shooter
 //
@@ -11,14 +11,17 @@
 
 #include "Game.hpp"
 
-class GameObject {
+class GameObject
+{
 private:
     SDL_Texture *texture;
     SDL_Rect dest, src;
-    SDL_Renderer* renderer;
+    SDL_Renderer *renderer;
+
 public:
     float w, h, x, y, velX, velY;
-    GameObject( const char* fileName, SDL_Renderer* renderer, int xPos, int yPos, int width, int height );
+    int alpha;
+    GameObject(const char *fileName, SDL_Renderer *renderer, int xPos, int yPos, int width, int height, int alpha = 255);
     void Update();
     void Render();
 };
