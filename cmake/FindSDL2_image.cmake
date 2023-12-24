@@ -50,6 +50,7 @@ find_path(SDL2_IMAGE_INCLUDE_DIR SDL_image.h
         # path suffixes to search inside ENV{SDLDIR}
         include/SDL2 include
         PATHS ${SDL2_IMAGE_PATH}
+        ${CMAKE_SOURCE_DIR}/lib/SDL2_image
         )
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
