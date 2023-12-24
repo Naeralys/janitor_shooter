@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.10)
 project(Shooter)
 
 if (WIN32)
-    set(SDL2_DIR "lib/sdl2")
+    set(SDL2_DIR "lib/")
 endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
