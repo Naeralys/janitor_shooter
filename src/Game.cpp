@@ -70,25 +70,29 @@ void Game::Init(const char *title, int xPos, int yPos, int width, int height, bo
 
     // Create game assets
     map = new GameObject("assets/background.png", Game::renderer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    assets = new GameObject("assets/background_assets.png", Game::renderer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    //assets = new GameObject("assets/background_assets.png", Game::renderer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     shadowOverlay = new GameObject("assets/shadow_overlay.png", Game::renderer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 200);
 
     // Load players
     playerOne = new Character("assets/player_one.bmp", Game::renderer, 130, SCREEN_HEIGHT - 300);
     playerTwo = new Character("assets/player_one.bmp", Game::renderer, SCREEN_WIDTH - 150, SCREEN_HEIGHT - 300);
+
+    // Load tiles
+    tile[0] = new GameObject("assets/platform.png", Game::renderer, 230, SCREEN_HEIGHT - 285, 160, 20, 0);
+    tile[1] = new GameObject("assets/platform.png", Game::renderer, (SCREEN_WIDTH / 2) - 80, SCREEN_HEIGHT - 420, 160, 20, 0);
+    tile[2] = new GameObject("assets/platform.png", Game::renderer, SCREEN_WIDTH - 405, SCREEN_HEIGHT - 285, 160, 20, 0);
+
+    // Populate game objects into vector array for easy update and rendering
+    gameObjects = {map, playerOne, playerTwo, tile[0], tile[1], tile[2], shadowOverlay};
+
     // Load bullets
     for (int i = 0; i < 10; i++)
     {
         bulletOne[i] = new GameObject("assets/bullet.bmp", Game::renderer, 0, 0, 5, 5);
         bulletTwo[i] = new GameObject("assets/bullet.bmp", Game::renderer, 0, 0, 5, 5);
+        gameObjects.push_back(bulletOne[i]);
+        gameObjects.push_back(bulletTwo[i]);
     }
-    // Load tiles
-    tile[0] = new GameObject("assets/platform.png", Game::renderer, 100, SCREEN_HEIGHT - 250, 195, 20);
-    tile[1] = new GameObject("assets/platform.png", Game::renderer, (SCREEN_WIDTH / 2) - 98, SCREEN_HEIGHT - 400, 195, 20);
-    tile[2] = new GameObject("assets/platform.png", Game::renderer, SCREEN_WIDTH - 290, SCREEN_HEIGHT - 250, 195, 20);
-
-    // Populate game objects into vector array for easy update and rendering
-    gameObjects = {map, assets, playerOne, playerTwo, tile[0], tile[1], tile[2], shadowOverlay};
 }
 
 void Game::Start()
@@ -100,7 +104,7 @@ void Game::Start()
         SDL_RenderClear(renderer);
 
         map->Render();
-        assets->Render();
+        // assets->Render();
         shadowOverlay->Render();
 
         SDL_RenderPresent(renderer);
@@ -469,6 +473,17 @@ void Game::Reset()
 {
     playerOne->Reset(150);
     playerTwo->Reset(SCREEN_WIDTH - 150);
+
+    // Reset all bullets to a hidden placement and velocity
+    for (int i = 0; i < 10; i++)
+    {
+        bulletOne[i]->x = -5;
+        bulletOne[i]->y = -5;
+        bulletOne[i]->velX = 0;
+        bulletTwo[i]->x = -5;
+        bulletTwo[i]->y = -5;
+        bulletTwo[i]->velX = 0;
+    }
 
     // Start screen
     Game::Start();

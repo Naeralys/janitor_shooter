@@ -16,12 +16,14 @@
 extern const int SCREEN_WIDTH;
 extern const int SCREEN_HEIGHT;
 
-class Game {
+class Game
+{
 private:
     SDL_Window *window;
     int isRunning;
+
 public:
-    void Init( const char *title, int xPos, int yPos, int width, int height, bool fullscreen );
+    void Init(const char *title, int xPos, int yPos, int width, int height, bool fullscreen);
     void HandleEvents();
     void Start();
     void Update();
@@ -29,7 +31,7 @@ public:
     void Clean();
     void Reset();
     bool Running() { return isRunning; };
-    
+
     static SDL_Renderer *renderer;
 };
 
