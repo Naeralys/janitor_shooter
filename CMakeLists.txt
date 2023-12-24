@@ -9,6 +9,7 @@ project(Shooter)
 
 if (WIN32)
     set(SDL2_DIR "lib/")
+    set(DSDL2_IMAGE_PATH "lib/SDL2_image")
 endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
