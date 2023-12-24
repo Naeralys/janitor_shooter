@@ -66,7 +66,7 @@ find_library(SDL2_IMAGE_LIBRARY
         ENV SDL2DIR
         PATH_SUFFIXES lib ${VC_LIB_PATH_SUFFIX}
         PATHS ${SDL2_IMAGE_PATH}
-        ${CMAKE_SOURCE_DIR}/lib/SDL2_image
+        ${CMAKE_SOURCE_DIR}/lib/SDL2_image/lib
         )
 
 if(SDL2_IMAGE_INCLUDE_DIR AND EXISTS "${SDL2_IMAGE_INCLUDE_DIR}/SDL_image.h")
