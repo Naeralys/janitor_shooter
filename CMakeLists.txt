@@ -14,12 +14,12 @@ endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+
 
 # Locate and include SDL2 and SDL2_image as dependencies
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
-include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIR})
+include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
 
 # Include source files as well as assets folder
 file(GLOB SOURCE_FILES
@@ -29,7 +29,7 @@ file(COPY assets DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 # Create executable and link libraries to build
 add_executable(Shooter ${SOURCE_FILES})
-target_link_libraries(Shooter ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
+target_link_libraries(Shooter PUBLIC SDL2::SDL2 SDL2_image::SDL2_image)
 
 # Package the installer with CPack
 include(InstallRequiredSystemLibraries)
